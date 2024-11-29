@@ -1,8 +1,81 @@
-import React, { useState } from 'react'
+import React, { useRef, useState } from 'react'
 import Header from './Header'
+import CheckValidData from '../Utils/Validate';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from "firebase/auth";
+import { auth } from '../Utils/Firebase';
+import { useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { addUser } from '../app/UserSlice';
 
 const Login = () => {
     const [isSignInForm, setIsSignInForm] = useState(true);
+    const [errorMessage, setErrorMessage] = useState(null);
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const email = useRef(null);
+    const password = useRef(null);
+    const name = useRef(null);
+
+    function handlebuttonclick() {
+        // validate the form data
+
+        const message = CheckValidData(email.current.value, password.current.value);
+        setErrorMessage(message);
+        if (message) return;
+
+        if (!isSignInForm) {
+            // Sign Up Logic
+            createUserWithEmailAndPassword(auth, email.current.value, password.current.value)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    // console.log(user);
+
+                    updateProfile(user,
+                        {
+                            displayName: name.current.value,
+                            photoURL: "https://avatars.githubusercontent.com/u/109842993?v=4",
+                        }).then(() => {
+                            const { uid, email, displayName, photoURL } = auth.currentUser;
+                            dispatch(addUser({
+                                uid: uid,
+                                email: email,
+                                displayName: displayName,
+                                photoURL: photoURL,
+                            }));
+                            navigate('/browse')
+                        }).catch((error) => {
+                            setErrorMessage(error.message)
+                        });
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    setErrorMessage(errorCode + " - " + errorMessage);
+                });
+        }
+        else {
+            // Sign In Logic
+            signInWithEmailAndPassword(auth, email.current.value, password.current.value)
+                .then((userCredential) => {
+                    const user = userCredential.user;
+                    navigate('/browse')
+                })
+                .catch((error) => {
+                    const errorCode = error.code; // This gives you the error code, like 'auth/user-not-found'
+                    const errorMessage = error.message; // The full error message from Firebase
+
+                    if (errorCode === "auth/user-not-found") {
+                        setErrorMessage("User not found in database");
+                    } else if (errorCode === "auth/invalid-credential") {
+                        setErrorMessage(" credentials, please check your email and password.");
+                    } else {
+                        // You can set a generic error message for other cases
+                        setErrorMessage(errorMessage);
+                    }
+                });
+        }
+    }
 
     function toggleSignInForm() {
         setIsSignInForm(!isSignInForm);
@@ -14,20 +87,56 @@ const Login = () => {
 
             {/* BackGround Image Section */}
             <img className='absolute'
-                src="https://assets.nflxext.com/ffe/siteui/vlv3/4690cab8-243a-4552-baef-1fb415632f74/web/IN-en-20241118-TRIFECTA-perspective_0b813abc-8365-4a43-a9d8-14c06e84c9f3_medium.jpg" alt="BackGround Image" />
+                src="https://assets.nflxext.com/ffe/siteui/vlv3/4690cab8-243a-4552-baef-1fb415632f74/web/IN-en-20241118-TRIFECTA-perspective_0b813abc-8365-4a43-a9d8-14c06e84c9f3_medium.jpg"
+                alt="BackGround Image"
+            />
 
-            {/* Sign In Section :- Email, Password and Sign In Button */}
-            <form action="" className='w-1/3 p-12 absolute bg-black text-white my-32 mx-auto right-0 left-0 rounded-lg bg-opacity-80'>
+            {/* Sign In Section: Email, Password, and Sign In Button */}
+            <form onSubmit={(e) => e.preventDefault()}
+                className='w-1/3 p-12 absolute bg-black text-white my-32 mx-auto right-0 left-0 rounded-lg bg-opacity-80'
+            >
 
-                <h1 className="font-bold text-3xl m-2 py-3">{isSignInForm ? "Sign In" : "Sign Up"}</h1>
+                <h1 className="font-bold text-3xl m-2 py-3">
+                    {isSignInForm ? "Sign In" : "Sign Up"}
+                </h1>
+
+                {/* Show Full Name input only for Sign Up */}
                 {!isSignInForm &&
-                    <input type="text" placeholder='Full Name' className="px-4 py-[15px] m-2 my-[12px] w-full rounded-md bg-black bg-opacity-40 border-2 border-gray-600  focus:border-gray-400 focus:ring-gray-300 focus:ring-2" />
+                    <input type="text"
+                        ref={name}
+                        placeholder='Full Name'
+                        className="px-4 py-[15px] m-2 my-[12px] w-full rounded-md bg-black bg-opacity-40 border-2 border-gray-600  focus:border-gray-400 focus:ring-gray-300 focus:ring-2"
+                    />
                 }
-                <input type="text" placeholder='Email or mobile number' className="px-4 py-[15px] m-2 my-[12px] w-full rounded-md bg-black bg-opacity-40 border-2 border-gray-600  focus:border-gray-400 focus:ring-gray-300 focus:ring-2" />
-                <input type="password" placeholder='Password' className="px-4 py-[15px] m-2 my-[12px] w-full rounded-md bg-black bg-opacity-40 border-2 border-gray-600  focus:border-gray-400 focus:ring-gray-300 focus:ring-2" />
-                <button className='p-3 py-[13px] m-2 my-[18px] w-full bg-[rgb(229,9,20)] rounded-md font-medium'>{isSignInForm ? "Sign In" : "Sign Up"}</button>
 
-                {/* Sign In Section:- Check New User  */}
+                {/* Email input */}
+                <input type="text"
+                    ref={email}
+                    placeholder='Email or mobile number'
+                    className="px-4 py-[15px] m-2 my-[12px] w-full rounded-md bg-black bg-opacity-40 border-2 border-gray-600  focus:border-gray-400 focus:ring-gray-300 focus:ring-2"
+                />
+
+                {/* Password input */}
+                <input type="password"
+                    ref={password}
+                    placeholder='Password'
+                    className="px-4 py-[15px] m-2 my-[12px] w-full rounded-md bg-black bg-opacity-40 border-2 border-gray-600  focus:border-gray-400 focus:ring-gray-300 focus:ring-2"
+                />
+
+                {/* Error message */}
+                {
+                    errorMessage
+                    &&
+                    <p className='text-red-600 mx-2 font-normal'>{"Incorrect " + errorMessage}</p>
+                }
+
+                {/* Submit Button */}
+                <button className='p-3 py-[13px] m-2 my-[18px] w-full bg-[rgb(229,9,20)] rounded-md font-medium'
+                    onClick={handlebuttonclick}>
+                    {isSignInForm ? "Sign In" : "Sign Up"}
+                </button>
+
+                {/* Sign In/Sign Up Toggle */}
                 <p className="p-3 cursor-pointer" onClick={toggleSignInForm}>
                     {isSignInForm ? (
                         <>New to Netflix? <strong className="font-bold hover:underline">Sign Up now.</strong></>
