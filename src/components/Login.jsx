@@ -59,7 +59,6 @@ const Login = () => {
             signInWithEmailAndPassword(auth, email.current.value, password.current.value)
                 .then((userCredential) => {
                     const user = userCredential.user;
-                    navigate('/browse')
                 })
                 .catch((error) => {
                     const errorCode = error.code; // This gives you the error code, like 'auth/user-not-found'
@@ -131,10 +130,14 @@ const Login = () => {
                 }
 
                 {/* Submit Button */}
-                <button className='p-3 py-[13px] m-2 my-[18px] w-full bg-[rgb(229,9,20)] rounded-md font-medium'
-                    onClick={handlebuttonclick}>
+                <button
+                    className="p-3 py-[13px] m-2 my-[18px] w-full bg-[rgb(229,9,20)] rounded-md font-medium transition-colors duration-200 ease-in-out 
+                            hover:bg-[rgb(200,0,6)] active:bg-[rgb(180,0,1)] focus:outline-none"
+                    onClick={handlebuttonclick}
+                >
                     {isSignInForm ? "Sign In" : "Sign Up"}
                 </button>
+
 
                 {/* Sign In/Sign Up Toggle */}
                 <p className="p-3 cursor-pointer" onClick={toggleSignInForm}>
