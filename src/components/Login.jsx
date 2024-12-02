@@ -6,6 +6,7 @@ import { auth } from '../Utils/Firebase';
 import { useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { addUser } from '../app/UserSlice';
+import { Netflix_Background_Img, photoURL } from '../Utils/Constants';
 
 const Login = () => {
     const [isSignInForm, setIsSignInForm] = useState(true);
@@ -34,7 +35,7 @@ const Login = () => {
                     updateProfile(user,
                         {
                             displayName: name.current.value,
-                            photoURL: "https://avatars.githubusercontent.com/u/109842993?v=4",
+                            photoURL: photoURL,
                         }).then(() => {
                             const { uid, email, displayName, photoURL } = auth.currentUser;
                             dispatch(addUser({
@@ -86,7 +87,7 @@ const Login = () => {
 
             {/* BackGround Image Section */}
             <img className='absolute'
-                src="https://assets.nflxext.com/ffe/siteui/vlv3/4690cab8-243a-4552-baef-1fb415632f74/web/IN-en-20241118-TRIFECTA-perspective_0b813abc-8365-4a43-a9d8-14c06e84c9f3_medium.jpg"
+                src={Netflix_Background_Img}
                 alt="BackGround Image"
             />
 
