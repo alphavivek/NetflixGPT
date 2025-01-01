@@ -8,8 +8,16 @@ export const API_Options = {
     method: 'GET',
     headers: {
         accept: 'application/json',
-        Authorization: 'Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiIzZjVjZmRiN2UxOWM0ZDFhMGM2OWM2MmM1OWY2MDc2NCIsIm5iZiI6MTczMzA1MzA0OS42MTYsInN1YiI6IjY3NGM0YTc5MTBkZDdmNDNiMGQ0ODdmMyIsInNjb3BlcyI6WyJhcGlfcmVhZCJdLCJ2ZXJzaW9uIjoxfQ.ZBZ8n2sDqtl_G7kKFHlHbESdaSxk9KDjnsULEUiAx9c'
+        Authorization: 'Bearer ' + import.meta.env.VITE_TMDB_KEY,
     }
 };
 
 export const IMG_URL_CDN = "https://image.tmdb.org/t/p/w500";
+
+export const Supported_languages = [
+    {identifier : "en" , name : "English"},
+    {identifier : "hindi" , name : "Hindi"},
+    {identifier : "chinese" , name : "Chinese"},
+];
+
+export const Gemini_API_KEY = import.meta.env.VITE_GEMINI_API_KEY;

@@ -86,15 +86,20 @@ const Login = () => {
             <Header />
 
             {/* BackGround Image Section */}
-            <img className='absolute'
+            <img className='fixed top-0 left-0 w-full h-full object-cover'
                 src={Netflix_Background_Img}
                 alt="BackGround Image"
             />
 
             {/* Sign In Section: Email, Password, and Sign In Button */}
-            <form onSubmit={(e) => e.preventDefault()}
+            {/* <form onSubmit={(e) => e.preventDefault()}
                 className='w-1/3 p-12 absolute bg-black text-white my-32 mx-auto right-0 left-0 rounded-lg bg-opacity-80'
+            > */}
+            <form
+                onSubmit={(e) => e.preventDefault()}
+                className='w-[90%] sm:w-2/3 md:w-1/2 lg:w-1/3 p-6 sm:p-10 md:p-12 absolute bg-black text-white my-16 sm:my-24 md:my-32 mx-auto right-0 left-0 rounded-lg bg-opacity-80'
             >
+
 
                 <h1 className="font-bold text-3xl m-2 py-3">
                     {isSignInForm ? "Sign In" : "Sign Up"}
